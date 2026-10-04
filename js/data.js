@@ -268,25 +268,25 @@ const UNITS = [
         explain: "직사각형은 가로와 세로의 비가 서로 다를 수 있으므로 항상 닮은 것은 아닙니다. (예: $1\\times2$ 직사각형과 $1\\times3$ 직사각형)"
       },
       {
-        id: "u1q3", level: "기본", type: "short",
+        id: "u1q3", fig: QFIG.u1q3, level: "기본", type: "short",
         q: "$\\triangle ABC \\backsim \\triangle DEF$이고 닮음비가 $2:3$이다. $\\overline{AB}=6\\,\\text{cm}$일 때, $\\overline{DE}$의 길이는?",
         unit: "cm", answer: ["9"],
         explain: "<ol><li>$\\overline{AB}:\\overline{DE}=2:3$</li><li>$6:\\overline{DE}=2:3$ → $2\\overline{DE}=18$</li><li>$\\overline{DE}=9\\,\\text{cm}$</li></ol>"
       },
       {
-        id: "u1q4", level: "기본", type: "short",
+        id: "u1q4", fig: QFIG.u1q4, level: "기본", type: "short",
         q: "$\\square ABCD \\backsim \\square EFGH$이고 $\\angle B = 70^\\circ$일 때, $\\angle F$의 크기는?",
         unit: "°", answer: ["70"],
         explain: "닮은 도형에서 대응각의 크기는 같습니다. $\\angle B$의 대응각은 $\\angle F$ 이므로 $\\angle F = 70^\\circ$ 입니다."
       },
       {
-        id: "u1q5", level: "응용", type: "short",
+        id: "u1q5", fig: QFIG.u1q5, level: "응용", type: "short",
         q: "닮음비가 $3:5$인 두 삼각형이 있다. 작은 삼각형의 둘레의 길이가 $12\\,\\text{cm}$일 때, 큰 삼각형의 둘레의 길이는?",
         unit: "cm", answer: ["20"],
         explain: "<ol><li>둘레의 길이의 비 = 닮음비 = $3:5$</li><li>$12:x = 3:5$ → $3x = 60$</li><li>$x = 20\\,\\text{cm}$</li></ol>"
       },
       {
-        id: "u1q6", level: "응용", type: "short",
+        id: "u1q6", fig: QFIG.u1q6, level: "응용", type: "short",
         q: "닮음비가 $2:5$인 두 직육면체가 있다. 작은 직육면체의 높이가 $4\\,\\text{cm}$일 때, 큰 직육면체의 높이는?",
         unit: "cm", answer: ["10"],
         explain: "대응하는 모서리의 길이의 비가 $2:5$ 이므로 $4:x=2:5$ → $2x=20$ → $x=10\\,\\text{cm}$"
@@ -334,21 +334,21 @@ const UNITS = [
     ],
     questions: [
       {
-        id: "u2q1", level: "기초", type: "mc",
+        id: "u2q1", fig: QFIG.u2q1, level: "기초", type: "mc",
         q: "$\\triangle ABC$에서 $\\overline{AB}=4, \\overline{BC}=6, \\overline{CA}=8$이고, $\\triangle DEF$에서 $\\overline{DE}=6, \\overline{EF}=9, \\overline{FD}=12$이다. 두 삼각형의 닮음 조건은?",
         choices: ["SSS 닮음", "SAS 닮음", "AA 닮음", "닮음이 아니다"],
         answer: 0,
         explain: "$4:6 = 6:9 = 8:12 = 2:3$ 으로 세 쌍의 대응변의 길이의 비가 모두 같으므로 <b>SSS 닮음</b>입니다."
       },
       {
-        id: "u2q2", level: "기초", type: "mc",
+        id: "u2q2", fig: QFIG.u2q2, level: "기초", type: "mc",
         q: "$\\triangle ABC$에서 $\\angle A=50^\\circ, \\angle B=60^\\circ$이고, $\\triangle DEF$에서 $\\angle D=50^\\circ, \\angle F=70^\\circ$이다. 두 삼각형의 닮음 조건은?",
         choices: ["SSS 닮음", "SAS 닮음", "AA 닮음", "닮음이 아니다"],
         answer: 2,
         explain: "$\\angle C = 180^\\circ - 50^\\circ - 60^\\circ = 70^\\circ$ 이므로 $\\angle A=\\angle D$, $\\angle C=\\angle F$ → <b>AA 닮음</b>입니다."
       },
       {
-        id: "u2q3", level: "기본", type: "mc",
+        id: "u2q3", fig: QFIG.u2q3, level: "기본", type: "mc",
         q: "$\\overline{AB}=3, \\overline{AC}=4, \\angle A=40^\\circ$인 $\\triangle ABC$와 $\\overline{DE}=6, \\overline{DF}=8, \\angle D=40^\\circ$인 $\\triangle DEF$의 닮음 조건은?",
         choices: ["SSS 닮음", "SAS 닮음", "AA 닮음", "닮음이 아니다"],
         answer: 1,
@@ -367,13 +367,13 @@ const UNITS = [
         explain: "SAS 닮음은 반드시 두 변의 <b>끼인각</b>이 같아야 합니다. 끼인각이 아닌 각이 같은 경우는 닮음이 보장되지 않습니다."
       },
       {
-        id: "u2q5", level: "응용", type: "short",
+        id: "u2q5", fig: QFIG.u2q5, level: "응용", type: "short",
         q: "$\\triangle ABC$에서 점 $D$는 $\\overline{AB}$ 위의 점, 점 $E$는 $\\overline{AC}$ 위의 점이고 $\\angle AED = \\angle ABC$이다. $\\overline{AD}=4, \\overline{AE}=6, \\overline{AB}=12$일 때, $\\overline{AC}$의 길이는?",
         answer: ["8"],
         explain: "<ol><li>$\\angle A$는 공통, $\\angle AED=\\angle ABC$ → $\\triangle ADE \\backsim \\triangle ACB$ (AA 닮음)</li><li>대응변: $\\overline{AE}:\\overline{AB} = \\overline{AD}:\\overline{AC}$</li><li>$6:12 = 4:\\overline{AC}$ → $\\overline{AC} = 8$</li></ol>"
       },
       {
-        id: "u2q6", level: "응용", type: "short",
+        id: "u2q6", fig: QFIG.u2q6, level: "응용", type: "short",
         q: "$\\triangle ABC$에서 점 $D$는 $\\overline{BC}$ 위의 점이고 $\\overline{AB}=6, \\overline{BD}=4, \\overline{BC}=9, \\overline{AC}=9$이다. $\\overline{AD}$의 길이는?",
         answer: ["6"],
         explain: "<ol><li>$\\overline{BA}:\\overline{BD}=6:4=3:2$, $\\overline{BC}:\\overline{BA}=9:6=3:2$, $\\angle B$ 공통</li><li>→ $\\triangle ABC \\backsim \\triangle DBA$ (SAS 닮음, 닮음비 $3:2$)</li><li>$\\overline{AC}:\\overline{DA}=3:2$ → $9:\\overline{AD}=3:2$ → $\\overline{AD}=6$</li></ol>"
@@ -437,13 +437,13 @@ const UNITS = [
         explain: "$\\overline{AD}:\\overline{AB}=\\overline{DE}:\\overline{BC}$ → $3:9=\\overline{DE}:12$ → $9\\overline{DE}=36$ → $\\overline{DE}=4$"
       },
       {
-        id: "u3q3", level: "기초", type: "short",
+        id: "u3q3", fig: QFIG.u3q3, level: "기초", type: "short",
         q: "$\\triangle ABC$에서 $\\overline{AB}, \\overline{AC}$의 중점을 각각 $M, N$이라 하자. $\\overline{BC}=14\\,\\text{cm}$일 때, $\\overline{MN}$의 길이는?",
         unit: "cm", answer: ["7"],
         explain: "중점연결정리에 의해 $\\overline{MN}=\\dfrac{1}{2}\\overline{BC}=\\dfrac{1}{2}\\times14=7\\,\\text{cm}$"
       },
       {
-        id: "u3q4", level: "기본", type: "short",
+        id: "u3q4", fig: QFIG.u3q4, level: "기본", type: "short",
         q: "세 평행선 $l\\parallel m\\parallel n$이 두 직선과 만나서 생기는 선분의 길이가 각각 $4, 6$ 과 $6, x$일 때, $x$의 값은? (같은 순서로 대응)",
         answer: ["9"],
         explain: "$4:6 = 6:x$ → $4x=36$ → $x=9$"
@@ -456,14 +456,14 @@ const UNITS = [
         explain: "$\\overline{AG}:\\overline{GD}=2:1$ 이므로 $\\overline{AG}=\\dfrac{2}{3}\\times12=8\\,\\text{cm}$"
       },
       {
-        id: "u3q6", level: "기본", type: "mc",
+        id: "u3q6", fig: FIG.centroidPlain, level: "기본", type: "mc",
         q: "점 $G$가 $\\triangle ABC$의 무게중심이고 $\\overline{GD}=3$일 때 ($D$는 $\\overline{BC}$의 중점), 중선 $\\overline{AD}$의 길이는?",
         choices: ["$6$", "$9$", "$12$", "$4.5$"],
         answer: 1,
         explain: "$\\overline{AG}:\\overline{GD}=2:1$ 이므로 $\\overline{AG}=6$, $\\overline{AD}=6+3=9$"
       },
       {
-        id: "u3q7", level: "응용", type: "mc",
+        id: "u3q7", fig: FIG.gbc(false), level: "응용", type: "mc",
         q: "점 $G$가 넓이가 $36\\,\\text{cm}^2$인 $\\triangle ABC$의 무게중심일 때, $\\triangle GBC$의 넓이는?",
         choices: ["$6\\,\\text{cm}^2$", "$9\\,\\text{cm}^2$", "$12\\,\\text{cm}^2$", "$18\\,\\text{cm}^2$"],
         answer: 2,
@@ -513,39 +513,39 @@ const UNITS = [
     ],
     questions: [
       {
-        id: "u4q1", level: "기초", type: "short",
+        id: "u4q1", fig: QFIG.u4q1, level: "기초", type: "short",
         q: "닮음비가 $2:3$인 두 삼각형에서 작은 삼각형의 넓이가 $8\\,\\text{cm}^2$일 때, 큰 삼각형의 넓이는?",
         unit: "cm²", answer: ["18"],
         explain: "넓이의 비 $=2^2:3^2=4:9$ → $8:x=4:9$ → $4x=72$ → $x=18\\,\\text{cm}^2$"
       },
       {
-        id: "u4q2", level: "기초", type: "mc",
+        id: "u4q2", fig: QFIG.u4q2, level: "기초", type: "mc",
         q: "반지름의 길이의 비가 $1:3$인 두 구의 겉넓이의 비는?",
         choices: ["$1:3$", "$1:6$", "$1:9$", "$1:27$"],
         answer: 2,
         explain: "두 구는 항상 닮음이고 닮음비 $1:3$ → 겉넓이의 비 $1^2:3^2=1:9$"
       },
       {
-        id: "u4q3", level: "기본", type: "short",
+        id: "u4q3", fig: QFIG.u4q3, level: "기본", type: "short",
         q: "닮음비가 $2:3$인 두 정육면체에서 작은 정육면체의 부피가 $16\\,\\text{cm}^3$일 때, 큰 정육면체의 부피는?",
         unit: "cm³", answer: ["54"],
         explain: "부피의 비 $=2^3:3^3=8:27$ → $16:x=8:27$ → $8x=432$ → $x=54\\,\\text{cm}^3$"
       },
       {
-        id: "u4q4", level: "기본", type: "short",
+        id: "u4q4", fig: QFIG.u4q4, level: "기본", type: "short",
         q: "두 닮은 도형의 넓이의 비가 $9:25$일 때, 닮음비는? (예: 2:3 형태로 입력)",
         answer: ["3:5"],
         explain: "$9:25 = 3^2:5^2$ 이므로 닮음비는 $3:5$"
       },
       {
-        id: "u4q5", level: "응용", type: "mc",
+        id: "u4q5", fig: FIG.cone.replace(/<text[^>]*>닮음비 1 : 2 → 부피 1 : 8<\/text>/, ""), level: "응용", type: "mc",
         q: "원뿔 모양의 그릇에 그릇 높이의 $\\dfrac{1}{2}$까지 물을 채웠다. 물의 부피는 그릇 전체 부피의 몇 배인가?",
         choices: ["$\\dfrac{1}{2}$배", "$\\dfrac{1}{4}$배", "$\\dfrac{1}{6}$배", "$\\dfrac{1}{8}$배"],
         answer: 3,
         explain: "물이 채워진 부분도 원뿔이고 그릇과 닮음비 $1:2$ → 부피의 비 $1^3:2^3=1:8$ → $\\dfrac{1}{8}$배"
       },
       {
-        id: "u4q6", level: "응용", type: "short",
+        id: "u4q6", fig: QFIG.u4q6, level: "응용", type: "short",
         q: "부피의 비가 $8:27$인 두 닮은 입체도형에서 작은 도형의 겉넓이가 $20\\,\\text{cm}^2$일 때, 큰 도형의 겉넓이는?",
         unit: "cm²", answer: ["45"],
         explain: "<ol><li>$8:27=2^3:3^3$ → 닮음비 $2:3$</li><li>겉넓이의 비 $2^2:3^2=4:9$</li><li>$20:x=4:9$ → $x=45\\,\\text{cm}^2$</li></ol>"
@@ -620,13 +620,13 @@ const UNITS = [
     ],
     questions: [
       {
-        id: "u5q1", level: "기초", type: "short",
+        id: "u5q1", fig: QFIG.u5q1, level: "기초", type: "short",
         q: "직각을 낀 두 변의 길이가 $6\\,\\text{cm}, 8\\,\\text{cm}$인 직각삼각형의 빗변의 길이는?",
         unit: "cm", answer: ["10"],
         explain: "$c^2 = 6^2+8^2 = 36+64 = 100$ → $c=10\\,\\text{cm}$ (3·4·5의 2배)"
       },
       {
-        id: "u5q2", level: "기초", type: "short",
+        id: "u5q2", fig: QFIG.u5q2, level: "기초", type: "short",
         q: "빗변의 길이가 $13\\,\\text{cm}$이고 다른 한 변의 길이가 $5\\,\\text{cm}$인 직각삼각형에서 나머지 한 변의 길이는?",
         unit: "cm", answer: ["12"],
         explain: "$b^2 = 13^2-5^2 = 169-25 = 144$ → $b=12\\,\\text{cm}$"
@@ -639,13 +639,13 @@ const UNITS = [
         explain: "가장 긴 변으로 확인: $5^2+12^2=25+144=169=13^2$ ✔︎<br/>나머지: $4+9\\ne16$, $16+25\\ne36$, $36+49\\ne81$"
       },
       {
-        id: "u5q4", level: "기본", type: "short",
+        id: "u5q4", fig: QFIG.u5q4, level: "기본", type: "short",
         q: "가로가 $9\\,\\text{cm}$, 세로가 $12\\,\\text{cm}$인 직사각형의 대각선의 길이는?",
         unit: "cm", answer: ["15"],
         explain: "대각선² $=9^2+12^2=81+144=225$ → 대각선 $=15\\,\\text{cm}$ (3·4·5의 3배)"
       },
       {
-        id: "u5q5", level: "기본", type: "mc",
+        id: "u5q5", fig: QFIG.u5q5, level: "기본", type: "mc",
         q: "세 변의 길이가 $7, x, 25$인 삼각형이 빗변의 길이가 $25$인 직각삼각형일 때, $x$의 값은?",
         choices: ["$18$", "$20$", "$24$", "$26$"],
         answer: 2,
