@@ -333,7 +333,11 @@ table.grid th { background: var(--surface-2); font-weight: 700; }
 .stamp-big.stamped { animation: stamp .55s cubic-bezier(.2, 1.6, .4, 1); }
 @keyframes stamp { 0% { transform: rotate(-14deg) scale(2.4); opacity: 0; } 100% { transform: rotate(-14deg) scale(1); opacity: 1; } }
 
-.acorn-slots { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; margin: 14px 0 6px; }
+.acorn-slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 260px; margin: 14px auto 6px; }
+.head-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-reset { margin-top: 8px; color: var(--muted); }
+.btn-reset:hover { color: var(--bad); border-color: #f2b2b2; background: var(--bad-soft); }
+.earn-none { color: var(--muted); font-weight: 600; font-size: 14px; }
 .acorn-slots span {
   aspect-ratio: 1; display: grid; place-items: center; border: 1px dashed #e2c98f; border-radius: 4px;
   font-size: 18px; background: #fffaf0;

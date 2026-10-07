@@ -10,7 +10,7 @@
   const ALL_QUESTIONS = UNITS.flatMap((u) => u.questions.map((q) => ({ ...q, unitId: u.id })));  // 점수 산정 대상
   const ALL_CHECKS = UNITS.flatMap((u) => u.checks.map((q) => ({ ...q, unitId: u.id })));        // 개념 확인 (점수 미포함)
   const QUESTION_INDEX = new Map([...ALL_QUESTIONS, ...ALL_CHECKS].map((q) => [q.id, q]));
-  const ACORNS_PER_STAMP = 10;
+  const ACORNS_PER_STAMP = 15;
   const $ = (sel, root = document) => root.querySelector(sel);
 
   // 새로고침 또는 브라우저 재실행 시 항상 새 세션으로 시작 (이전 기록 즉시 초기화)
@@ -30,17 +30,33 @@
       school,
       student,
       loginAt: new Date().toISOString(),
-      answers: {},   // { [questionId]: { given, correct } }
+      answers: {},   // { [questionId]: { given, correct, rewarded } }
       selected: {},  // 객관식 임시 선택
-      acorns: 0,       // 현재 보유 도토리 (10개가 되면 칭찬도장으로 변환)
+      acorns: 0,       // 현재 보유 도토리 (15개가 되면 칭찬도장으로 변환)
       stamps: 0,       // 칭찬도장 개수
       acornsEarned: 0, // 누적 획득 도토리
+      rewarded: {},    // 이미 도토리를 받은 문제/미션 (기록 초기화 후에도 유지 → 중복 지급 방지)
       seen: {},        // 개념 카드 열람 단원
       flipped: {},     // 뒤집어 본 플래시카드
       labsDone: {},    // 실험실 미션 완료 단원
       submitted: null
     };
     saveState();
+  }
+
+  // 풀이 기록만 지우고 다시 풀 수 있게 함. 도토리·칭찬도장과 '이미 받은 문제' 목록은 유지 (중복 지급 방지)
+  function resetRecords() {
+    const ok = confirm(
+      "학습 기록을 초기화할까요?\n\n" +
+      "• 문제 풀이, OX 퀴즈, 카드, 실험실 미션 기록이 지워지고 처음부터 다시 풀 수 있어요.\n" +
+      "• 모은 도토리와 칭찬도장은 그대로 남아요.\n" +
+      "• 이미 맞힌 문제는 다시 맞혀도 도토리를 받을 수 없어요."
+    );
+    if (!ok) return;
+    Object.assign(state, { answers: {}, selected: {}, seen: {}, flipped: {}, labsDone: {}, submitted: null });
+    saveState();
+    navigate({ name: "home" });
+    toast("기록을 초기화했어요. 처음부터 다시 풀어 보세요!");
   }
 
   function endSession() {
@@ -100,7 +116,22 @@
     }
   }
 
-  // 정답 시 도토리 1개 지급, 10개가 모이면 칭찬도장 1개로 자동 변환
+  // 문제·미션별로 도토리는 처음 맞혔을 때 한 번만. 새로 지급 대상이면 true
+  function grant(key) {
+    if (state.rewarded[key]) return false;
+    state.rewarded[key] = true;
+    return true;
+  }
+
+  // 정답 피드백 속 도토리 문구 (이미 받은 문제면 안내만)
+  function earnHtml(a, full = true) {
+    if (!a.correct) return "";
+    return a.rewarded
+      ? `<span class="earn">🌰 ${full ? "도토리 +1 획득!" : "+1"}</span>`
+      : `<span class="earn earn-none">🌰 이미 도토리를 받은 문제예요</span>`;
+  }
+
+  // 도토리 1개 지급, 15개가 모이면 칭찬도장 1개로 자동 변환
   function awardAcorn(fromEl) {
     state.acorns++;
     state.acornsEarned++;
@@ -164,7 +195,7 @@
          <div class="sum"><span>🏅 칭찬도장 ${state.stamps}개</span><span>🌰 도토리 ${state.acorns}개</span></div>
          <button type="button" class="btn btn-primary btn-block" data-close-modal>계속 공부하기</button>`
       : `<h3 id="modal-title">나의 도토리 & 칭찬도장</h3>
-         <p>문제를 1개 맞힐 때마다 도토리 1개! 도토리 ${ACORNS_PER_STAMP}개 → 칭찬도장 1개</p>
+         <p>문제를 1개 맞힐 때마다 도토리 1개! 도토리 ${ACORNS_PER_STAMP}개 → 칭찬도장 1개<br/><small>같은 문제는 처음 맞혔을 때 한 번만 받을 수 있어요.</small></p>
          <div class="acorn-slots">${acornSlots()}</div>
          <p style="font-size:14px">다음 칭찬도장까지 도토리 <b>${ACORNS_PER_STAMP - state.acorns}개</b> 남았어요.</p>
          <div class="stamp-board">${stampBoard()}</div>
@@ -312,7 +343,10 @@
           <h2>학습 대시보드</h2>
           <p>개념 카드 → 카드 뒤집기 → OX 퀴즈 → 수학 실험실 → 문제 풀이 순서로 공부해 보세요.</p>
         </div>
-        <button class="btn btn-primary" data-nav="report" type="button">📊 최종 리포트 보기</button>
+        <div class="head-actions">
+          <button class="btn" data-reset type="button">↺ 기록 초기화</button>
+          <button class="btn btn-primary" data-nav="report" type="button">📊 최종 리포트 보기</button>
+        </div>
       </div>
       <div class="stats">
         <div class="panel stat"><div class="label">전체 문제</div><div class="value">${o.total}<small> 문항</small></div></div>
@@ -423,7 +457,7 @@
         : `<span class="mq-num mq-bad"><s>${esc(a.given)}</s> ${it.answer}</span>`;
     }).join(`<span class="mq-dot">·</span>`);
     const foot = a
-      ? `<div class="mq-fb ${a.correct ? "ok" : "bad"}">${a.correct ? `⭕ 정답! <span class="earn">🌰 +1</span>` : "❌ 아쉬워요!"}<br/><small>${it.hint}</small></div>`
+      ? `<div class="mq-fb ${a.correct ? "ok" : "bad"}">${a.correct ? `⭕ 정답! ${earnHtml(a, false)}` : "❌ 아쉬워요!"}<br/><small>${it.hint}</small></div>`
       : `<button type="button" class="btn mq-btn" data-mq="${it.id}">확인</button>`;
     return `<div class="mq-item ${a ? (a.correct ? "ok" : "bad") : ""}" id="mq-${it.id}"><div class="mq-nums">${nums}</div>${foot}</div>`;
   }
@@ -435,7 +469,8 @@
     const given = inp.value.trim();
     if (!given) { toast("빈칸에 들어갈 수를 입력해 주세요."); inp.focus(); return; }
     const correct = Number(given) === it.answer;
-    state.answers[id] = { given, correct };
+    const rewarded = correct && grant(id);
+    state.answers[id] = { given, correct, rewarded };
     saveState();
     const box = document.getElementById(`mq-${id}`);
     box.outerHTML = renderMiniItem(it);
@@ -443,7 +478,7 @@
     const quiz = fresh.closest(".mini-quiz");
     quiz.querySelector(".mq-count").textContent =
       [...quiz.querySelectorAll(".mq-item")].filter((el) => el.classList.contains("ok")).length;
-    if (correct) awardAcorn(fresh.querySelector(".earn"));
+    if (rewarded) awardAcorn(fresh.querySelector(".earn"));
   }
 
   /* --- 카드 뒤집기 --- */
@@ -509,7 +544,7 @@
           <div class="ox-summary">
             <div class="ox-big">${correct === qs.length ? "🏆" : "🎯"}</div>
             <h3>OX 퀴즈 완료!</h3>
-            <p>${qs.length}문제 중 <b>${correct}문제</b> 정답 · 🌰 도토리 +${correct}</p>
+            <p>${qs.length}문제 중 <b>${correct}문제</b> 정답 · 🌰 도토리 +${qs.filter((q) => state.answers[q.id] && state.answers[q.id].rewarded).length}</p>
           </div>
           <ul class="ox-review">${qs.map((q) => {
             const a = state.answers[q.id];
@@ -529,7 +564,7 @@
     const fb = a ? `
       <div class="feedback ${a.correct ? "ok" : "bad"}">
         <div class="verdict">${a.correct ? "⭕ 정답입니다!" : "❌ 아쉬워요!"} 정답은 <b>${"OX"[q.answer]}</b></div>
-        ${a.correct ? `<div class="earn">🌰 도토리 +1 획득!</div>` : ""}
+        ${a.correct ? `<div>${earnHtml(a)}</div>` : ""}
         <div class="explain"><b>해설</b><br/>${q.explain}
           ${q.explainFig ? `<div class="ox-fig ox-explain-fig">${q.explainFig}</div>` : ""}</div>
       </div>
@@ -549,11 +584,12 @@
     const u = UNITS.find((x) => x.id === view.unitId);
     const q = u.checks.find((x) => x.id === qid);
     const correct = choice === q.answer;
-    state.answers[qid] = { given: choice, correct };
+    const rewarded = correct && grant(qid);
+    state.answers[qid] = { given: choice, correct, rewarded };
     saveState();
     view.ox = u.checks.indexOf(q);
     paint();
-    if (correct) awardAcorn($(".ox-card .earn"));
+    if (rewarded) awardAcorn($(".ox-card .earn"));
   }
 
   /* --- 수학 실험실 --- */
@@ -568,7 +604,7 @@
         <div class="mission ${done ? "done" : ""}" id="mission">
           <span class="mission-tag">🎯 미션</span>
           <span class="mission-text">${lab.mission}</span>
-          <span class="mission-status" id="mission-status">${done ? "✅ 완료!" : "성공하면 🌰 +1"}</span>
+          <span class="mission-status" id="mission-status">${done ? "✅ 완료!" : state.rewarded[`lab:${u.id}`] ? "도토리는 이미 받았어요" : "성공하면 🌰 +1"}</span>
         </div>
         <div id="lab-root">${lab.html()}</div>
         <div class="lab-result" id="lab-result" ${done ? "" : "hidden"}>✅ 이미 완료한 미션이에요. 자유롭게 더 실험해 보세요!</div>
@@ -588,11 +624,13 @@
     saveState();
     $("#mission").classList.add("done");
     $("#mission-status").textContent = "✅ 미션 완료!";
+    const rewarded = grant(`lab:${u.id}`);
+    saveState();
     const r = $("#lab-result");
     r.hidden = false;
-    r.innerHTML = `🎉 <b>미션 성공!</b> ${esc(msg)} <span class="earn">🌰 도토리 +1</span>`;
+    r.innerHTML = `🎉 <b>미션 성공!</b> ${esc(msg)} ${earnHtml({ correct: true, rewarded }, false)}`;
     markStep("lab");
-    awardAcorn(r.querySelector(".earn"));
+    if (rewarded) awardAcorn(r.querySelector(".earn"));
   }
 
   /* --- 문제 풀이 --- */
@@ -642,7 +680,7 @@
       feedback = `
         <div class="feedback ${ans.correct ? "ok" : "bad"}">
           <div class="verdict">${ans.correct ? "⭕ 정답입니다!" : "❌ 오답입니다."}</div>
-          ${ans.correct ? `<div class="earn">🌰 도토리 +1 획득!</div>` : ""}
+          ${ans.correct ? `<div>${earnHtml(ans)}</div>` : ""}
           <div class="answer">정답: ${right}</div>
           <div class="explain"><b>해설</b><br/>${q.explain}</div>
         </div>`;
@@ -697,12 +735,13 @@
       if (!given) { toast("정답을 입력해 주세요."); inp.focus(); return; }
       correct = isShortCorrect(given, q.answer);
     }
-    state.answers[qid] = { given, correct };
+    const rewarded = correct && grant(qid);
+    state.answers[qid] = { given, correct, rewarded };
     delete state.selected[qid];
     saveState();
     const el = rerenderQuestion(qid);
     el.querySelector(".feedback").scrollIntoView({ behavior: "smooth", block: "nearest" });
-    if (correct) awardAcorn(el.querySelector(".earn"));
+    if (rewarded) awardAcorn(el.querySelector(".earn"));
   }
 
   /* ---------------- 최종 리포트 ---------------- */
@@ -769,6 +808,7 @@
             <dt>보상</dt><dd>🏅 칭찬도장 ${state.stamps}개 · 🌰 도토리 ${state.acorns}개 (누적 ${state.acornsEarned}개)</dd>
           </dl>
           <button type="button" class="btn btn-primary btn-block" id="send-result">📤 구글 시트로 학습 결과 제출</button>
+          <button type="button" class="btn btn-block btn-reset" data-reset>↺ 기록 초기화하고 다시 풀기</button>
           <div id="send-notice">${notice}</div>
         </aside>
       </div>`;
@@ -934,6 +974,7 @@
 
     // 개념 카드 미니 퀴즈
     if (t.dataset.mq) return checkMini(t.dataset.mq);
+    if (t.hasAttribute("data-reset")) return resetRecords();
 
     // 카드 뒤집기
     if (t.dataset.flip) return flipCard(t, !t.classList.contains("flipped"));
