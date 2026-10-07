@@ -352,7 +352,6 @@
           <p>개념 카드 → 카드 뒤집기 → OX 퀴즈 → 수학 실험실 → 문제 풀이 순서로 공부해 보세요.</p>
         </div>
         <div class="head-actions">
-          <button class="btn" data-reset-mode="records" type="button" title="도토리·칭찬도장은 유지">↺ 기록 초기화</button>
           <button class="btn btn-danger" data-reset-mode="full" type="button" title="도토리·칭찬도장까지 모두 삭제">⚠ 완전 초기화</button>
           <button class="btn btn-primary" data-nav="report" type="button">📊 최종 리포트 보기</button>
         </div>
