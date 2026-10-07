@@ -335,8 +335,12 @@ table.grid th { background: var(--surface-2); font-weight: 700; }
 
 .acorn-slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 260px; margin: 14px auto 6px; }
 .head-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.btn-reset { margin-top: 8px; color: var(--muted); }
-.btn-reset:hover { color: var(--bad); border-color: #f2b2b2; background: var(--bad-soft); }
+.btn-danger { color: var(--bad); border-color: #f2b2b2; }
+.btn-danger:hover { background: var(--bad-soft); border-color: var(--bad); }
+.reset-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.btn-reset { color: var(--muted); }
+.btn-reset.btn-danger { color: var(--bad); }
+.reset-note { font-size: 12px !important; margin: 6px 0 0 !important; color: var(--muted); }
 .earn-none { color: var(--muted); font-weight: 600; font-size: 14px; }
 .acorn-slots span {
   aspect-ratio: 1; display: grid; place-items: center; border: 1px dashed #e2c98f; border-radius: 4px;

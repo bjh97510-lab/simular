@@ -44,19 +44,27 @@
     saveState();
   }
 
-  // 풀이 기록만 지우고 다시 풀 수 있게 함. 도토리·칭찬도장과 '이미 받은 문제' 목록은 유지 (중복 지급 방지)
-  function resetRecords() {
-    const ok = confirm(
-      "학습 기록을 초기화할까요?\n\n" +
-      "• 문제 풀이, OX 퀴즈, 카드, 실험실 미션 기록이 지워지고 처음부터 다시 풀 수 있어요.\n" +
-      "• 모은 도토리와 칭찬도장은 그대로 남아요.\n" +
-      "• 이미 맞힌 문제는 다시 맞혀도 도토리를 받을 수 없어요."
-    );
-    if (!ok) return;
+  // records: 풀이 기록만 삭제 (도토리·칭찬도장·'이미 받은 문제' 목록 유지 → 중복 지급 방지)
+  // full: 도토리·칭찬도장까지 모두 삭제 (로그인 정보와 세션은 유지)
+  function resetRecords(mode) {
+    const msg = mode === "full"
+      ? "⚠ 완전 초기화할까요?\n\n" +
+        "• 모든 풀이 기록이 지워져요.\n" +
+        `• 도토리 ${state.acorns}개와 칭찬도장 ${state.stamps}개도 모두 사라져요.\n` +
+        "• 모든 문제에서 도토리를 처음부터 다시 받을 수 있어요.\n\n" +
+        "되돌릴 수 없어요."
+      : "학습 기록을 초기화할까요?\n\n" +
+        "• 문제 풀이, OX 퀴즈, 카드, 실험실 미션 기록이 지워지고 처음부터 다시 풀 수 있어요.\n" +
+        "• 모은 도토리와 칭찬도장은 그대로 남아요.\n" +
+        "• 이미 맞힌 문제는 다시 맞혀도 도토리를 받을 수 없어요.";
+    if (!confirm(msg)) return;
     Object.assign(state, { answers: {}, selected: {}, seen: {}, flipped: {}, labsDone: {}, submitted: null });
+    if (mode === "full") Object.assign(state, { acorns: 0, stamps: 0, acornsEarned: 0, rewarded: {} });
     saveState();
+    closeModal();
+    updateRewardBar(mode === "full" ? "acorn" : null);
     navigate({ name: "home" });
-    toast("기록을 초기화했어요. 처음부터 다시 풀어 보세요!");
+    toast(mode === "full" ? "완전 초기화했어요. 도토리와 칭찬도장도 0개부터 시작해요." : "기록을 초기화했어요. 처음부터 다시 풀어 보세요!");
   }
 
   function endSession() {
@@ -344,7 +352,8 @@
           <p>개념 카드 → 카드 뒤집기 → OX 퀴즈 → 수학 실험실 → 문제 풀이 순서로 공부해 보세요.</p>
         </div>
         <div class="head-actions">
-          <button class="btn" data-reset type="button">↺ 기록 초기화</button>
+          <button class="btn" data-reset-mode="records" type="button" title="도토리·칭찬도장은 유지">↺ 기록 초기화</button>
+          <button class="btn btn-danger" data-reset-mode="full" type="button" title="도토리·칭찬도장까지 모두 삭제">⚠ 완전 초기화</button>
           <button class="btn btn-primary" data-nav="report" type="button">📊 최종 리포트 보기</button>
         </div>
       </div>
@@ -808,7 +817,11 @@
             <dt>보상</dt><dd>🏅 칭찬도장 ${state.stamps}개 · 🌰 도토리 ${state.acorns}개 (누적 ${state.acornsEarned}개)</dd>
           </dl>
           <button type="button" class="btn btn-primary btn-block" id="send-result">📤 구글 시트로 학습 결과 제출</button>
-          <button type="button" class="btn btn-block btn-reset" data-reset>↺ 기록 초기화하고 다시 풀기</button>
+          <div class="reset-row">
+            <button type="button" class="btn btn-reset" data-reset-mode="records">↺ 기록 초기화</button>
+            <button type="button" class="btn btn-reset btn-danger" data-reset-mode="full">⚠ 완전 초기화</button>
+          </div>
+          <p class="reset-note">기록 초기화: 도토리·칭찬도장 유지 / 완전 초기화: 도토리·칭찬도장까지 모두 삭제</p>
           <div id="send-notice">${notice}</div>
         </aside>
       </div>`;
@@ -974,7 +987,7 @@
 
     // 개념 카드 미니 퀴즈
     if (t.dataset.mq) return checkMini(t.dataset.mq);
-    if (t.hasAttribute("data-reset")) return resetRecords();
+    if (t.dataset.resetMode) return resetRecords(t.dataset.resetMode);
 
     // 카드 뒤집기
     if (t.dataset.flip) return flipCard(t, !t.classList.contains("flipped"));
