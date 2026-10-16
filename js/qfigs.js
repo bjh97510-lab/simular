@@ -271,7 +271,7 @@ const QFIG = (() => {
 
   const u3q4 = parallels({ gaps: [4, 6], p: [70, 140], q: [230, 330], labels: { a: "4", b: "6", c: "6", d: "x" } });
   const u3q8 = parallels({ gaps: [8, 12], p: [60, 150], q: [210, 300], labels: { a: "8", b: "12", c: "x", d: "15" }, names: ["A", "B", "C", "D", "E", "F"] });
-  const parallelConcept = parallels({ gaps: [2, 3], p: [60, 135], q: [215, 320], labels: { a: "a", b: "b", c: "c", d: "d" }, names: ["A", "B", "C", "D", "E", "F"], live: true });
+  const parallelConcept = parallels({ gaps: [2, 3], p: [135, 60], q: [215, 320], labels: { a: "a", b: "b", c: "c", d: "d" }, names: ["A", "B", "C", "D", "E", "F"], live: true });
   const parallelCross = parallels({ gaps: [2, 3], p: [90, 300], q: [290, 90], labels: { a: "a", b: "b", c: "c", d: "d" }, caption: "두 직선이 교차해도 a : b = c : d", live: true });
 
   /* 사다리꼴 ABCD (AD ∥ EF ∥ BC). k = AE : AB 비율, diag 이면 대각선 AC 와 교점 G 표시 */
