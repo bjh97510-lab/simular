@@ -166,16 +166,119 @@ const QFIG = (() => {
     <path d="M116,52 l8,6 M56,127 l8,6 M176,58 l8,-6 M236,133 l8,-6" stroke="#ea580c" stroke-width="2"/>`
     + T(150, 14, "A") + T(18, 186, "B") + T(282, 186, "C") + T(76, 99, "M", { col: GIVEN }) + T(224, 99, "N", { col: GIVEN })
     + T(150, 88, "MN = ?", { col: ASK, fs: 14, w: 800 }) + T(150, 192, "BC = 14", { col: GIVEN, fs: 14, w: 800 }));
-  const u3q4 = svg(380, 215, `
-    <line x1="20" y1="40" x2="360" y2="40" stroke="#0891b2" stroke-width="2"/>
-    <line x1="20" y1="100" x2="360" y2="100" stroke="#0891b2" stroke-width="2"/>
-    <line x1="20" y1="190" x2="360" y2="190" stroke="#0891b2" stroke-width="2"/>
-    <line x1="60" y1="20" x2="135" y2="205" stroke="#5d6879" stroke-width="1.8"/>
-    <line x1="230" y1="20" x2="330" y2="205" stroke="#5d6879" stroke-width="1.8"/>`
-    + T(368, 45, "l", { anchor: "start", col: "#0891b2" }) + T(368, 105, "m", { anchor: "start", col: "#0891b2" }) + T(368, 195, "n", { anchor: "start", col: "#0891b2" })
-    + T(78, 76, "4", { col: GIVEN, fs: 15, w: 800 }) + T(100, 152, "6", { col: GIVEN, fs: 15, w: 800 })
-    + T(262, 76, "6", { col: GIVEN, fs: 15, w: 800 }) + T(292, 152, "x", { col: ASK, fs: 16, w: 800 })
-    + T(190, 212, "l ∥ m ∥ n", { col: "#5d6879", fs: 12 }));
+  /* 세 평행선 l ∥ m ∥ n 과 두 직선 p, q
+   * gaps: [윗칸, 아랫칸] 의 실제 비율 → 평행선 사이 간격을 그 비율로 정확히 배치
+   * p, q: 각 직선의 위·아래 x 좌표 (기울기)  labels: { a, b, c, d } (p 위 두 선분, q 위 두 선분)
+   * cross: true 이면 두 직선이 평행선 사이에서 교차하는 모양 */
+  function parallels(o) {
+    const W = 400, left = 22, right = 360;
+    const top = o.caption ? 58 : 40, span = 150;
+    const ys = [top, top + (span * o.gaps[0]) / (o.gaps[0] + o.gaps[1]), top + span];
+    const yA = ys[0] - 22, yB = ys[2] + 22; // 직선 p, q 를 평행선 바깥까지 연장
+    const xAt = (line, y) => line[0] + ((y - yA) * (line[1] - line[0])) / (yB - yA);
+    const ptsOn = (line) => ys.map((y) => [xAt(line, y), y]);
+    const P = ptsOn(o.p), Q = ptsOn(o.q);
+    const C1 = "#2f5bea", C2 = "#db2777";
+    const seg = (a, b, col, label, side) => {
+      const m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+      const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy);
+      const n = [(-dy / l) * side, (dx / l) * side]; // 선분에 수직인 방향으로 라벨 띄우기
+      const isAsk = /[x?]/.test(label);
+      return `<line x1="${r1(a[0])}" y1="${r1(a[1])}" x2="${r1(b[0])}" y2="${r1(b[1])}" stroke="${col}" stroke-width="5" stroke-linecap="round"/>`
+        + T(m[0] + n[0] * 16, m[1] + n[1] * 16 + 5, label, { col: isAsk ? ASK : col, fs: 16, w: 800 });
+    };
+    const dot = (p, name, dx) => `<circle cx="${r1(p[0])}" cy="${r1(p[1])}" r="3.5" fill="#1b2333"/>` + (name ? T(p[0] + dx, p[1] - 7, name, { fs: 13 }) : "");
+    const names = o.names || [];
+    let g = o.caption ? T(W / 2, 22, o.caption, { fs: 13, col: "#5d6879" }) : "";
+    ys.forEach((y, i) => {
+      g += `<line x1="${left}" y1="${r1(y)}" x2="${right}" y2="${r1(y)}" stroke="#0891b2" stroke-width="2"/>`
+        + T(right + 10, y + 5, ["l", "m", "n"][i], { anchor: "start", col: "#0891b2", fs: 15, w: 800 });
+    });
+    g += `<line x1="${o.p[0]}" y1="${yA}" x2="${o.p[1]}" y2="${yB}" stroke="#5d6879" stroke-width="1.6"/>`
+      + `<line x1="${o.q[0]}" y1="${yA}" x2="${o.q[1]}" y2="${yB}" stroke="#5d6879" stroke-width="1.6"/>`;
+    g += seg(P[0], P[1], C1, o.labels.a, -1) + seg(P[1], P[2], C2, o.labels.b, -1)
+      + seg(Q[0], Q[1], C1, o.labels.c, 1) + seg(Q[1], Q[2], C2, o.labels.d, 1);
+    // 점 이름은 선분 라벨(a~d)의 반대쪽에 배치
+    P.forEach((p, i) => (g += dot(p, names[i], -13)));
+    Q.forEach((p, i) => (g += dot(p, names[i + 3], 13)));
+    g += T(W / 2 - 20, yB + 20, "l ∥ m ∥ n", { col: "#5d6879", fs: 12, w: 600 });
+    return svg(W, yB + 28, g);
+  }
+
+  const u3q4 = parallels({ gaps: [4, 6], p: [70, 140], q: [230, 330], labels: { a: "4", b: "6", c: "6", d: "x" } });
+  const u3q8 = parallels({ gaps: [8, 12], p: [60, 150], q: [210, 300], labels: { a: "8", b: "12", c: "x", d: "15" }, names: ["A", "B", "C", "D", "E", "F"] });
+  const parallelConcept = parallels({ gaps: [2, 3], p: [60, 135], q: [215, 320], labels: { a: "a", b: "b", c: "c", d: "d" }, names: ["A", "B", "C", "D", "E", "F"] });
+  const parallelCross = parallels({ gaps: [2, 3], p: [90, 300], q: [290, 90], labels: { a: "a", b: "b", c: "c", d: "d" }, caption: "두 직선이 교차해도 a : b = c : d" });
+
+  /* 사다리꼴 ABCD (AD ∥ EF ∥ BC). k = AE : AB 비율, diag 이면 대각선 AC 와 교점 G 표시 */
+  function trapezoid(o) {
+    const s = o.scale, by = o.top + o.h;
+    const A = [o.ax, o.top], D = [o.ax + o.ad * s, o.top];
+    const B = [o.bx, by], C = [o.bx + o.bc * s, by];
+    const E = lerp(A, B, o.k), F = lerp(D, C, o.k);
+    let g = `<polygon points="${P([A, B, C, D])}" fill="#e6f7fb" stroke="#0891b2" stroke-width="2" stroke-linejoin="round"/>`;
+    if (o.diag) {
+      const G = lerp(A, C, o.k);
+      g += `<line x1="${A[0]}" y1="${A[1]}" x2="${C[0]}" y2="${C[1]}" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="6 4"/>`
+        + `<line x1="${r1(E[0])}" y1="${r1(E[1])}" x2="${r1(G[0])}" y2="${r1(G[1])}" stroke="#2f5bea" stroke-width="4"/>`
+        + `<line x1="${r1(G[0])}" y1="${r1(G[1])}" x2="${r1(F[0])}" y2="${r1(F[1])}" stroke="#db2777" stroke-width="4"/>`
+        + `<circle cx="${r1(G[0])}" cy="${r1(G[1])}" r="4" fill="#7c3aed"/>` + T(G[0] + 2, G[1] - 9, "G", { col: "#7c3aed", fs: 13 });
+    } else {
+      g += `<line x1="${r1(E[0])}" y1="${r1(E[1])}" x2="${r1(F[0])}" y2="${r1(F[1])}" stroke="#db2777" stroke-width="3.5"/>`;
+    }
+    g += [E, F].map((p) => `<circle cx="${r1(p[0])}" cy="${r1(p[1])}" r="4" fill="#ea580c"/>`).join("");
+    g += T(A[0] - 4, A[1] - 9, "A") + T(D[0] + 4, D[1] - 9, "D") + T(B[0] - 10, B[1] + 18, "B") + T(C[0] + 10, C[1] + 18, "C")
+      + T(E[0] - 14, E[1] + 5, "E", { col: GIVEN }) + T(F[0] + 14, F[1] + 5, "F", { col: GIVEN });
+    // 변 AB 위의 비 표시 (바깥쪽)
+    if (o.ratio) {
+      const m1 = lerp(A, E, 0.5), m2 = lerp(E, B, 0.5);
+      g += T(m1[0] - 16, m1[1] + 5, o.ratio[0], { col: GIVEN, fs: 14, w: 800 }) + T(m2[0] - 16, m2[1] + 5, o.ratio[1], { col: GIVEN, fs: 14, w: 800 });
+    }
+    if (o.ticks) {
+      const tick = (p, q, n) => {
+        const m = lerp(p, q, 0.5), dx = q[0] - p[0], dy = q[1] - p[1], l = Math.hypot(dx, dy);
+        const nx = -dy / l, ny = dx / l;
+        let t = "";
+        for (let i = 0; i < n; i++) { const c = [m[0] + (dx / l) * (i - (n - 1) / 2) * 5, m[1] + (dy / l) * (i - (n - 1) / 2) * 5]; t += `<line x1="${r1(c[0] - nx * 6)}" y1="${r1(c[1] - ny * 6)}" x2="${r1(c[0] + nx * 6)}" y2="${r1(c[1] + ny * 6)}" stroke="#ea580c" stroke-width="2"/>`; }
+        return t;
+      };
+      g += tick(A, E, 1) + tick(E, B, 1) + tick(D, F, 2) + tick(F, C, 2);
+    }
+    g += T((A[0] + D[0]) / 2, A[1] - 9, o.adLabel, { col: GIVEN, fs: 14, w: 800 })
+      + T((B[0] + C[0]) / 2, by + 20, o.bcLabel, { col: GIVEN, fs: 14, w: 800 });
+    if (o.efLabel) g += T((E[0] + F[0]) / 2, E[1] - 8, o.efLabel, { col: o.efLabel.includes("?") ? ASK : "#db2777", fs: 14, w: 800 });
+    return svg(o.w || 300, by + 32, g);
+  }
+
+  // 개념: AE : EB = m : n, 대각선 AC 로 나누어 생각하기
+  const trapConcept = trapezoid({ ax: 100, top: 34, h: 150, bx: 30, ad: 6, bc: 12, scale: 18, k: 1 / 3, diag: true, ratio: ["m", "n"], adLabel: "AD", bcLabel: "BC", w: 300 });
+  // 문제: AD = 6, BC = 12, AE : EB = 1 : 2 → EF = 8
+  const u3q9 = trapezoid({ ax: 100, top: 34, h: 150, bx: 40, ad: 6, bc: 12, scale: 18, k: 1 / 3, ratio: ["1", "2"], adLabel: "AD = 6", bcLabel: "BC = 12", efLabel: "EF = ?", w: 300 });
+  // 문제: 사다리꼴 두 변의 중점 E, F → EF = (8 + 14) ÷ 2 = 11
+  const u3q11 = trapezoid({ ax: 96, top: 34, h: 140, bx: 34, ad: 8, bc: 14, scale: 16, k: 1 / 2, ticks: true, adLabel: "AD = 8", bcLabel: "BC = 14", efLabel: "EF = ?", w: 300 });
+
+  // 문제: AB ∥ EF ∥ DC (모두 밑변에 수직), AC 와 BD 의 교점 E → EF = 6×12/(6+12) = 4
+  const u3q10 = (() => {
+    const s = 12, by = 200, xB = 50, xC = 290;
+    const B = [xB, by], C = [xC, by], A = [xB, by - 6 * s], D = [xC, by - 12 * s];
+    // 교점: A + t(C - A) = B + u(D - B) 를 풀어 정확히 계산
+    const t = (6 * s) / (6 * s + 12 * s); // 닮음비로 구한 AE : AC = 1 : 3 이 되는 지점
+    const E = lerp(A, C, t), F = [E[0], by];
+    const L = (p, q, col, w, dash) => `<line x1="${r1(p[0])}" y1="${r1(p[1])}" x2="${r1(q[0])}" y2="${r1(q[1])}" stroke="${col}" stroke-width="${w}" ${dash ? `stroke-dasharray="${dash}"` : ""} stroke-linecap="round"/>`;
+    const sq = (p) => `<polyline points="${P([[p[0], p[1] - 9], [p[0] + 9, p[1] - 9], [p[0] + 9, p[1]]])}" fill="none" stroke="#1b2333"/>`;
+    return svg(340, 250,
+      L([30, by], [310, by], "#1b2333", 2)
+      + L(A, C, "#7c3aed", 1.8, "6 4") + L(B, D, "#7c3aed", 1.8, "6 4")
+      + L(A, B, "#2f5bea", 4) + L(D, C, "#2f5bea", 4) + L(E, F, "#db2777", 4)
+      + sq(B) + sq(F) + `<polyline points="${P([[C[0] - 9, C[1]], [C[0] - 9, C[1] - 9], [C[0], C[1] - 9]])}" fill="none" stroke="#1b2333"/>`
+      + `<circle cx="${r1(E[0])}" cy="${r1(E[1])}" r="4" fill="#db2777"/>`
+      + T(A[0] - 10, A[1] - 6, "A") + T(B[0] - 10, B[1] + 18, "B") + T(D[0] + 10, D[1] - 6, "D") + T(C[0] + 10, C[1] + 18, "C")
+      + T(E[0], E[1] - 11, "E", { col: "#db2777" }) + T(F[0], F[1] + 18, "F", { col: "#db2777" })
+      + T(A[0] - 22, (A[1] + B[1]) / 2 + 5, "6", { col: GIVEN, fs: 15, w: 800 })
+      + T(D[0] + 22, (D[1] + C[1]) / 2 + 5, "12", { col: GIVEN, fs: 15, w: 800 })
+      + T(E[0] + 20, (E[1] + F[1]) / 2 + 5, "?", { col: ASK, fs: 17, w: 800 })
+      + T(170, 244, "AB ∥ EF ∥ DC", { col: "#5d6879", fs: 12, w: 600 }));
+  })();
 
   /* ---------- 4단원 ---------- */
   const u4q1 = pair([[1.2, 2.8], [0, 0], [4, 0]], 25, 37.5, { inner: "8 cm²", innerFs: 13, sides: { 1: "2" } }, { inner: "? cm²", innerCol: ASK, sides: { 1: "3" } }, "닮음비 2 : 3");
@@ -202,5 +305,6 @@ const QFIG = (() => {
     + T(140, 94, "?", { col: ASK, fs: 18, w: 800 }));
   const u5q5 = right(7, 24, { a: "7", b: "x", c: "25" });
 
-  return { u1q3, u1q4, u1q5, u1q6, u2q1, u2q2, u2q3, u2q5, u2q6, u3q3, u3q4, u4q1, u4q2, u4q3, u4q4, u4q6, u5q1, u5q2, u5q4, u5q5 };
+  return { u1q3, u1q4, u1q5, u1q6, u2q1, u2q2, u2q3, u2q5, u2q6, u3q3, u3q4, u3q8, u3q9, u3q10, u3q11,
+    parallelConcept, parallelCross, trapConcept, u4q1, u4q2, u4q3, u4q4, u4q6, u5q1, u5q2, u5q4, u5q5 };
 })();

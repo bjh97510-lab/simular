@@ -182,6 +182,9 @@ table.grid th { background: var(--surface-2); font-weight: 700; }
 .chip.lv-응용 { color: #b4441b; border-color: #f5c9b5; background: #fff3ed; }
 .chip.lv-개념 { color: #8a5a12; border-color: #f1d9a7; background: #fffaf0; }
 .q-text { font-size: 17px; margin: 0 0 12px; }
+.concept.wide .fig { width: 360px; }
+.fig-inline { max-width: 330px; margin: 12px 0 0; padding: 6px; background: #fff; border: 1px dashed var(--line); border-radius: 6px; }
+.fig-inline svg { width: 100%; height: auto; display: block; }
 .q .fig {
   width: 380px; max-width: 100%; margin: 6px 0 14px; padding: 8px; background: #fff;
   border: 1px solid var(--line); border-radius: 6px;

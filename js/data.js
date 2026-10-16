@@ -405,9 +405,29 @@ const UNITS = [
       },
       {
         title: "평행선 사이의 선분의 길이의 비",
-        html: `<p>세 평행선 $l\\parallel m\\parallel n$ 이 두 직선과 만날 때</p>
-               <div class="formula">$a:b = c:d$</div>
-               <p>평행선 사이에 생기는 선분의 길이의 비는 항상 같습니다.</p>`
+        wide: true,
+        fig: QFIG.parallelConcept,
+        html: `<p>세 평행선 $l\\parallel m\\parallel n$ 이 두 직선 $p, q$와 만날 때, 평행선 사이에 생기는 선분의 길이의 비는 같습니다.</p>
+               <div class="formula">$\\overline{AB}:\\overline{BC} = \\overline{DE}:\\overline{EF}$ &nbsp;즉&nbsp; $a:b = c:d$</div>
+               <ul>
+                 <li>비례식은 <b>안쪽 곱 = 바깥쪽 곱</b>: $a:b=c:d \\;\\Rightarrow\\; ad = bc$</li>
+                 <li>전체와 부분의 비도 같아요: $a:(a+b) = c:(c+d)$</li>
+                 <li>같은 직선 위의 선분끼리 짝을 지어야 해요. ($a$와 $b$는 직선 $p$, $c$와 $d$는 직선 $q$)</li>
+               </ul>
+               <div class="tip"><b>왜 그럴까?</b> 직선 $q$를 평행이동해 점 $A$를 지나게 하면, 삼각형과 평행선의 성질 $\\overline{DE}\\parallel\\overline{BC}$ 를 그대로 쓸 수 있어요.</div>
+               <div class="fig-inline">${QFIG.parallelCross}</div>`
+      },
+      {
+        title: "사다리꼴과 평행선",
+        wide: true,
+        fig: QFIG.trapConcept,
+        html: `<p>사다리꼴 $ABCD$에서 $\\overline{AD}\\parallel\\overline{EF}\\parallel\\overline{BC}$, $\\overline{AE}:\\overline{EB}=m:n$ 일 때 $\\overline{EF}$의 길이는 <b>대각선 $\\overline{AC}$를 그어</b> 두 삼각형으로 나누어 구합니다.</p>
+               <ol>
+                 <li>$\\triangle ABC$에서 $\\overline{EG}\\parallel\\overline{BC}$ → $\\overline{EG} = \\dfrac{m}{m+n}\\,\\overline{BC}$</li>
+                 <li>$\\triangle ACD$에서 $\\overline{GF}\\parallel\\overline{AD}$ → $\\overline{GF} = \\dfrac{n}{m+n}\\,\\overline{AD}$</li>
+                 <li>$\\overline{EF} = \\overline{EG} + \\overline{GF}$</li>
+               </ol>
+               <div class="tip"><b>TIP</b> $E, F$가 두 변의 <b>중점</b>이면 $\\overline{EF} = \\dfrac{\\overline{AD}+\\overline{BC}}{2}$ (두 밑변의 평균)</div>`
       },
       {
         title: "삼각형의 무게중심",
@@ -468,6 +488,31 @@ const UNITS = [
         choices: ["$6\\,\\text{cm}^2$", "$9\\,\\text{cm}^2$", "$12\\,\\text{cm}^2$", "$18\\,\\text{cm}^2$"],
         answer: 2,
         explain: "무게중심과 세 꼭짓점을 이어 만든 세 삼각형의 넓이는 같으므로 $\\triangle GBC=\\dfrac{1}{3}\\times36=12\\,\\text{cm}^2$"
+      },
+      {
+        id: "u3q8", fig: QFIG.u3q8, level: "기본", type: "short",
+        q: "세 평행선 $l\\parallel m\\parallel n$이 두 직선과 그림과 같이 만날 때, $\\overline{AB}=8$, $\\overline{BC}=12$, $\\overline{DE}=x$, $\\overline{EF}=15$이다. $x$의 값은?",
+        answer: ["10"],
+        explain: "<ol><li>$\\overline{AB}:\\overline{BC}=\\overline{DE}:\\overline{EF}$</li><li>$8:12=x:15$ → $12x=120$</li><li>$x=10$</li></ol>"
+      },
+      {
+        id: "u3q9", fig: QFIG.u3q9, level: "응용", type: "short",
+        q: "사다리꼴 $ABCD$에서 $\\overline{AD}\\parallel\\overline{EF}\\parallel\\overline{BC}$이고 $\\overline{AD}=6$, $\\overline{BC}=12$, $\\overline{AE}:\\overline{EB}=1:2$일 때, $\\overline{EF}$의 길이는?",
+        answer: ["8"],
+        explain: "<ol><li>대각선 $\\overline{AC}$를 긋고 $\\overline{EF}$와의 교점을 $G$라 하자.</li><li>$\\triangle ABC$에서 $\\overline{EG}=\\dfrac{1}{3}\\overline{BC}=\\dfrac{1}{3}\\times12=4$</li><li>$\\triangle ACD$에서 $\\overline{GF}=\\dfrac{2}{3}\\overline{AD}=\\dfrac{2}{3}\\times6=4$</li><li>$\\overline{EF}=4+4=8$</li></ol>"
+      },
+      {
+        id: "u3q10", fig: QFIG.u3q10, level: "응용", type: "short",
+        q: "그림에서 $\\overline{AB}\\parallel\\overline{EF}\\parallel\\overline{DC}$이고, 점 $E$는 $\\overline{AC}$와 $\\overline{BD}$의 교점이다. $\\overline{AB}=6$, $\\overline{DC}=12$일 때, $\\overline{EF}$의 길이는?",
+        answer: ["4"],
+        explain: "<ol><li>$\\triangle EAB\\backsim\\triangle ECD$ (AA 닮음) 이므로 $\\overline{AE}:\\overline{EC}=6:12=1:2$</li><li>$\\triangle ABC$에서 $\\overline{EF}\\parallel\\overline{AB}$ 이므로 $\\overline{EF}:\\overline{AB}=\\overline{CE}:\\overline{CA}=2:3$</li><li>$\\overline{EF}=6\\times\\dfrac{2}{3}=4$</li></ol><small>참고: $\\overline{EF}=\\dfrac{ab}{a+b}=\\dfrac{6\\times12}{6+12}=4$</small>"
+      },
+      {
+        id: "u3q11", fig: QFIG.u3q11, level: "기본", type: "mc",
+        q: "$\\overline{AD}\\parallel\\overline{BC}$인 사다리꼴 $ABCD$에서 두 점 $E, F$는 각각 $\\overline{AB}, \\overline{DC}$의 중점이다. $\\overline{AD}=8$, $\\overline{BC}=14$일 때, $\\overline{EF}$의 길이는?",
+        choices: ["$10$", "$11$", "$12$", "$22$"],
+        answer: 1,
+        explain: "<ol><li>대각선 $\\overline{AC}$와 $\\overline{EF}$의 교점을 $G$라 하면 중점연결정리에 의해</li><li>$\\overline{EG}=\\dfrac{1}{2}\\overline{BC}=7$, $\\overline{GF}=\\dfrac{1}{2}\\overline{AD}=4$</li><li>$\\overline{EF}=7+4=11$ &nbsp;(= $\\dfrac{8+14}{2}$)</li></ol>"
       }
     ]
   },
