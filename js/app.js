@@ -313,6 +313,7 @@
     else if (view.name === "unit") main.innerHTML = renderUnit(view.unitId, view.tab || "concept");
     else if (view.name === "report") main.innerHTML = renderReport();
     renderMath(main);
+    QFIG.mountLive(main); // 움직이는 그림 (평행선 개념 카드)
     if (view.name === "unit" && view.tab === "lab") mountLab(UNITS.find((x) => x.id === view.unitId));
     if (view.name === "report") showSheetStatus();
   }

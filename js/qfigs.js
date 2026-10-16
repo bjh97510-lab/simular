@@ -171,8 +171,25 @@ const QFIG = (() => {
    * p, q: 각 직선의 위·아래 x 좌표 (기울기)  labels: { a, b, c, d } (p 위 두 선분, q 위 두 선분)
    * cross: true 이면 두 직선이 평행선 사이에서 교차하는 모양 */
   function parallels(o) {
+    const { W, H, g } = parallelsBody(o);
+    if (!o.live) return svg(W, H, g);
+    // 움직이는 그림: 설정을 data 속성에 담아 두고 mountLive() 가 드래그를 연결
+    return `<svg class="pl-live" data-pl="${encodeURIComponent(JSON.stringify(o))}" viewBox="0 0 ${W} ${r1(H)}" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans KR, sans-serif" style="touch-action:none">${g}</svg>`;
+  }
+
+  // 길이의 비를 간단한 자연수의 비로 (예: 0.666… → "2 : 3")
+  function simpleRatio(x, y) {
+    const r = x / y;
+    for (let d = 1; d <= 12; d++) {
+      const n = r * d;
+      if (Math.abs(n - Math.round(n)) < 0.02 && Math.round(n) > 0) return `${Math.round(n)} : ${d}`;
+    }
+    return `${(Math.round(r * 100) / 100)} : 1`;
+  }
+
+  function parallelsBody(o) {
     const W = 400, left = 22, right = 360;
-    const top = o.caption ? 58 : 40, span = 150;
+    const top = o.caption ? (o.live ? 78 : 58) : 40, span = 150; // 움직이는 그림은 ↔ 손잡이 공간 확보
     const ys = [top, top + (span * o.gaps[0]) / (o.gaps[0] + o.gaps[1]), top + span];
     const yA = ys[0] - 22, yB = ys[2] + 22; // 직선 p, q 를 평행선 바깥까지 연장
     const xAt = (line, y) => line[0] + ((y - yA) * (line[1] - line[0])) / (yB - yA);
@@ -201,14 +218,61 @@ const QFIG = (() => {
     // 점 이름은 선분 라벨(a~d)의 반대쪽에 배치
     P.forEach((p, i) => (g += dot(p, names[i], -13)));
     Q.forEach((p, i) => (g += dot(p, names[i + 3], 13)));
+    if (o.live) {
+      // 끌기 손잡이(↔)와 넓은 투명 터치 영역
+      [["p", o.p, C1], ["q", o.q, C2]].forEach(([key, L]) => {
+        g += `<line class="pl-hit" data-line="${key}" x1="${L[0]}" y1="${yA}" x2="${L[1]}" y2="${yB}" stroke="transparent" stroke-width="22" style="cursor:ew-resize"/>`
+          + `<g class="pl-grip" data-line="${key}" style="cursor:ew-resize"><circle cx="${r1(L[0])}" cy="${yA - 4}" r="12" fill="#fff" stroke="#5d6879" stroke-width="1.6"/>`
+          + T(L[0], yA + 1, "↔", { fs: 13, col: "#1b2333", w: 800 }) + `</g>`;
+      });
+      const d = (p1, p2) => Math.hypot(p2[0] - p1[0], p2[1] - p1[1]);
+      g += T(W / 2 - 20, yB + 22, `a : b = ${simpleRatio(d(P[0], P[1]), d(P[1], P[2]))}  ·  c : d = ${simpleRatio(d(Q[0], Q[1]), d(Q[1], Q[2]))}`, { col: "#138a52", fs: 13, w: 800 });
+      g += T(W / 2 - 20, yB + 40, "↔ 두 직선을 좌우로 끌어 보세요", { col: "#5d6879", fs: 11, w: 600 });
+      return { W, H: yB + 48, g };
+    }
     g += T(W / 2 - 20, yB + 20, "l ∥ m ∥ n", { col: "#5d6879", fs: 12, w: 600 });
-    return svg(W, yB + 28, g);
+    return { W, H: yB + 28, g };
+  }
+
+  // 페이지에 들어간 움직이는 평행선 그림에 드래그 연결 (직선 p, q 를 수평으로 평행이동)
+  function mountLive(root) {
+    root.querySelectorAll("svg.pl-live").forEach((el) => {
+      if (el.dataset.mounted) return;
+      el.dataset.mounted = "1";
+      const o = JSON.parse(decodeURIComponent(el.dataset.pl));
+      const draw = () => { el.innerHTML = parallelsBody(o).g; };
+      const toLocal = (e) => {
+        const pt = el.createSVGPoint();
+        pt.x = e.clientX; pt.y = e.clientY;
+        return pt.matrixTransform(el.getScreenCTM().inverse());
+      };
+      let drag = null;
+      el.addEventListener("pointerdown", (e) => {
+        const h = e.target.closest("[data-line]");
+        if (!h) return;
+        drag = { key: h.dataset.line, x0: toLocal(e).x, line: o[h.dataset.line].slice() };
+        el.setPointerCapture(e.pointerId);
+        e.preventDefault();
+      });
+      el.addEventListener("pointermove", (e) => {
+        if (!drag) return;
+        const L = drag.line;
+        // 직선의 위·아래 끝이 모두 평행선 안쪽에 남도록 이동 범위 제한
+        const lo = 30 - Math.min(L[0], L[1]), hi = 350 - Math.max(L[0], L[1]);
+        const dx = Math.max(lo, Math.min(hi, toLocal(e).x - drag.x0));
+        o[drag.key] = [L[0] + dx, L[1] + dx];
+        draw();
+      });
+      const end = () => { drag = null; };
+      el.addEventListener("pointerup", end);
+      el.addEventListener("pointercancel", end);
+    });
   }
 
   const u3q4 = parallels({ gaps: [4, 6], p: [70, 140], q: [230, 330], labels: { a: "4", b: "6", c: "6", d: "x" } });
   const u3q8 = parallels({ gaps: [8, 12], p: [60, 150], q: [210, 300], labels: { a: "8", b: "12", c: "x", d: "15" }, names: ["A", "B", "C", "D", "E", "F"] });
-  const parallelConcept = parallels({ gaps: [2, 3], p: [60, 135], q: [215, 320], labels: { a: "a", b: "b", c: "c", d: "d" }, names: ["A", "B", "C", "D", "E", "F"] });
-  const parallelCross = parallels({ gaps: [2, 3], p: [90, 300], q: [290, 90], labels: { a: "a", b: "b", c: "c", d: "d" }, caption: "두 직선이 교차해도 a : b = c : d" });
+  const parallelConcept = parallels({ gaps: [2, 3], p: [60, 135], q: [215, 320], labels: { a: "a", b: "b", c: "c", d: "d" }, names: ["A", "B", "C", "D", "E", "F"], live: true });
+  const parallelCross = parallels({ gaps: [2, 3], p: [90, 300], q: [290, 90], labels: { a: "a", b: "b", c: "c", d: "d" }, caption: "두 직선이 교차해도 a : b = c : d", live: true });
 
   /* 사다리꼴 ABCD (AD ∥ EF ∥ BC). k = AE : AB 비율, diag 이면 대각선 AC 와 교점 G 표시 */
   function trapezoid(o) {
@@ -306,5 +370,5 @@ const QFIG = (() => {
   const u5q5 = right(7, 24, { a: "7", b: "x", c: "25" });
 
   return { u1q3, u1q4, u1q5, u1q6, u2q1, u2q2, u2q3, u2q5, u2q6, u3q3, u3q4, u3q8, u3q9, u3q10, u3q11,
-    parallelConcept, parallelCross, trapConcept, u4q1, u4q2, u4q3, u4q4, u4q6, u5q1, u5q2, u5q4, u5q5 };
+    parallelConcept, parallelCross, trapConcept, mountLive, u4q1, u4q2, u4q3, u4q4, u4q6, u5q1, u5q2, u5q4, u5q5 };
 })();
